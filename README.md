@@ -36,3 +36,9 @@ Security Features also Included :
         -> Session Management (Whole web app)
         -> Logging (whole web app)
         -> Role Based Access Control (Whole web app)
+
+Take Note :
+
+        -> Running of the App is on App_Run.py
+        -> There are 2 files (App_Config.py & mysql_handler_log.py) connecting to MySQL
+        -> Creating first admin account by changing the role from 'user' to 'admin' in the MySQL server under the table user 
