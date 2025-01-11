@@ -138,3 +138,4 @@ class UserPoints(db.Model):
 
     def __repr__(self):
         return f"<UserPoints {self.username} - {self.points}>"
+

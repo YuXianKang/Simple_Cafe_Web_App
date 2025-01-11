@@ -2,35 +2,9 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<style>
-    h1 {
-        color: #000;
-        text-align: center;
-        font-family: Raleway;
-        font-size: 40px;
-        font-style: normal;
-        font-weight: 700;
-        line-height: normal;
-    }
 
-   .carousel {
-        width: 85%;
-        height: calc(80vw * 0.5);
-        border-radius: 25px;
-        margin: auto;
-    }
+<link rel="stylesheet" href="{{ url_for('static', filename='css/non-login/home.css') }}">
 
-   .carousel-inner {
-        height: calc(80vw * 0.5);
-        border-radius: 25px;
-    }
-
-   .carousel-inner img {
-        margin: auto;
-    }
-</style>
-
-<!-- HTML Structure -->
 <h1 class="display-4">Welcome to cafecrest☕</h1>
 
 <div id="carouselExampleIndicators" class="carousel slide">

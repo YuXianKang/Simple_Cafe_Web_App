@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %} Add Payments {% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login/payment_details.css') }}">
+
+<div class="form-container">
+    <h2>Payment Details</h2>
+    <form method="POST" action="" id="payment_details">
+        <div class="form-group">
+            {{ render_field(form.card_number, class="form-control", type="password") }}
+            <small class="form-text text-muted">Include 1 space after 4 numbers</small>
+            <span class="toggle-password" onclick="togglePasswordVisibility(this)">
+                <i class="fa fa-eye"></i>
+            </span>
+        </div>
+        <div class="form-group">
+            {{ render_field(form.expiration_date, class="form-control") }}
+            <small class="form-text text-muted">Format: MM/YY</small>
+        </div>
+        <div class="form-group">
+            {{ render_field(form.cvv, class="form-control", type="password") }}
+            <span class="toggle-password" onclick="togglePasswordVisibility(this)">
+                <i class="fa fa-eye"></i>
+            </span>
+        </div>
+        <div class="form-group">
+            {{ render_field(form.card_name, class="form-control") }}
+            <small class="form-text text-muted">All Caps</small>
+        </div>
+        <button type="submit" form="payment_details" value="Submit">Submit</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ url_for('static', filename='js/paymentVisibility.js') }}"></script>
+{% endblock %}

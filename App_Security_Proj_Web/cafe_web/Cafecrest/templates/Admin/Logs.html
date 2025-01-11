@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block styles %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/logs.css') }}">
+
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Log Messages</h1>
+    <table class="log-table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Message</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ log.message }}</td>
+                <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

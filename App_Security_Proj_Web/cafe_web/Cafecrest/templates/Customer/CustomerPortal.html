@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login/CustomerPortal.css') }}">
+
+<div class="customer_portal_margins">
+    <h1>Customer Portal</h1>
+</div>
+<div class="customer_portal_margin">
+    <div class="name_div">
+        <div class="name_div_secondary">
+            <div class="center text-center">{{ user.username }}</div>
+            <hr>
+            <div class="center text-center">
+                <p>{{ user_category }} Member</p>
+            </div>
+        </div>
+        <div class="name_div_secondary">
+            <div class="center text-center">This Year</div>
+            <table class="table center text-center">
+                <tr>
+                    <th>Orders</th>
+                    <th>Points</th>
+                </tr>
+                <tr>
+                    <td>{{ user_orders_count }}</td>
+                    <td>{{ user_points_value }}</td>
+                </tr>
+            </table>
+            <div class="center text-center">
+                <a class="center text-center hyperlink" href="/view_points">View Points</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="customer_info_div">
+        <div class="center text-center text-large">Information</div>
+        <hr>
+        <div class="customer_info_div_is">
+            <div class="div">
+                <a href="/orderHistory">View Order History</a>
+            </div>
+            <hr>
+            <div class="div">
+                Rewards
+            </div>
+            <hr>
+            <div class="div">
+                <a href="/account">Account Details</a>
+            </div>
+            <hr>
+            <div class="div">
+                <a href="/retrieve_payment">Payment Details</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+       .navbar-brown {
+            background-color: #176146;
+        }
+
+       .wrapper {
+            display: flex;
+            width: 100%;
+        }
+
+       .navBorder {
+            border: none;
+            margin: 0;
+            padding: 0;
+        }

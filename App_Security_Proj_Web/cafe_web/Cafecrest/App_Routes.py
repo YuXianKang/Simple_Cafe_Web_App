@@ -1,8 +1,5 @@
 from flask import *
 from Models import *
-from Order_Product_Payment_Forms import *
-from Fedback_Form import CreateFeedbackForm
-from ChatBot import chatbot_response
 from cryptography.fernet import Fernet
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -12,17 +9,18 @@ from markupsafe import escape
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from datetime import timedelta, datetime
-from Error_handle_routes import eh as errors_bp
+import re, os, uuid, requests
 from App_config import config
-from Account_Lockout import max_attempts, lockout_duration
-import re
-import os
-import uuid
-import requests
+from Forms_Class.Order_Product_Payment_Forms import *
+from Forms_Class.Fedback_Form import CreateFeedbackForm
+from Security_Features.Error_handle_routes import eh as errors_bp
+from Security_Features.Account_Lockout import max_attempts, lockout_duration
+from Security_Features.logging_config import configure_logging
+from Security_Features.Encryption_Payment import encrypt_data, decrypt_data
 from products import food, coffee, non_coffee, all_products
-from Encryption_Payment import encrypt_data, decrypt_data
+from ChatBot import chatbot_response
 from Order_Calculation import *
-from logging_config import configure_logging
+
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -59,7 +57,7 @@ def home():
 @app.route('/about_us')
 def about_us():
     app.logger.info('About Us Page Accessed!')
-    return render_template('about_us.html')
+    return render_template('All/about_us.html')
 
 
 @app.route('/createStaffAccount', methods=["GET", "POST"])
@@ -134,7 +132,7 @@ def create_staff_account():
             app.logger.error(f'Failed to sign up user. Email already registered: {email}')
             flash('Email already registered. Please log in or use a different email.')
             return redirect(url_for('login'))
-    return render_template('createStaffSignUp.html')
+    return render_template('Admin/createStaffSignUp.html')
 
 
 @app.route("/createSignUp", methods=["GET", "POST"])
@@ -223,7 +221,7 @@ def signup():
             flash('Email already registered. Please log in or use a different email.')
             return redirect(url_for('login'))
 
-    return render_template('createSignUp.html')
+    return render_template('All/createSignUp.html')
 
 
 @app.route("/Login", methods=["GET", "POST"])
@@ -315,7 +313,7 @@ def grant_admin(user_id):
         db.session.commit()
         flash(f'User {user.username} has been granted admin privileges.', 'success')
         return redirect(url_for('show_staff'))
-    return render_template('grant_admin.html', user=user)
+    return render_template('Admin/grant_admin.html', user=user)
 
 
 @app.route('/account')
@@ -324,7 +322,7 @@ def account():
 
     if user:
         app.logger.info('Account page accessed by user %s', session['username'])
-        return render_template('account.html', user=user)
+        return render_template('All/account.html', user=user)
     else:
         app.logger.info('Account page accessed without a valid session')
         return redirect(url_for('home'))
@@ -340,7 +338,7 @@ def show_staff():
 
     staff = User.query.filter_by(role='staff').all()
     app.logger.info('Staff accounts page accessed by admin %s', session['username'])
-    return render_template('staff_accounts.html', staff=staff)
+    return render_template('Admin/staff_accounts.html', staff=staff)
 
 
 @app.route('/delete_user/<int:user_id>', methods=['POST'])
@@ -363,7 +361,7 @@ def show_customer():
 
     customer = User.query.filter_by(role='user').all()
     app.logger.info('Customer accounts page accessed by admin %s', session['username'])
-    return render_template('customer_accounts.html', customer=customer)
+    return render_template('Admin/customer_accounts.html', customer=customer)
 
 
 @app.route('/delete_customer/<int:user_id>', methods=['POST'])
@@ -425,7 +423,7 @@ def update_account():
         flash('Account successfully updated.', 'success')
         return redirect(url_for('account'))
 
-    return render_template('update_account.html', user=user)
+    return render_template('All/update_account.html', user=user)
 
 
 @app.route('/account/delete', methods=['POST'])
@@ -471,7 +469,7 @@ def admin_portal():
                            session.get('username', 'unknown'))
         return "Access Denied. This feature requires admin-level access!", 403
 
-    return render_template('AdminPortal.html')
+    return render_template('Admin/AdminPortal.html')
 
 
 @app.route('/customerPortal/')
@@ -506,7 +504,7 @@ def customer_portal():
             user_category = "Bronze"
 
         app.logger.info('Customer portal accessed by user %s', session['username'])
-        return render_template('CustomerPortal.html', user=user, user_orders_count=user_orders_count, user_points_value=user_points_value, user_category=user_category)
+        return render_template('Customer/CustomerPortal.html', user=user, user_orders_count=user_orders_count, user_points_value=user_points_value, user_category=user_category)
     else:
         return redirect(url_for('home'))
 
@@ -536,7 +534,7 @@ def view_points():
 
         points_needed = next_level_threshold - user_points_value
 
-        return render_template('view_points.html', username=username, user_points_value=user_points_value, category=category, next_level_threshold=next_level_threshold, points_needed=points_needed)
+        return render_template('Customer/view_points.html', username=username, user_points_value=user_points_value, category=category, next_level_threshold=next_level_threshold, points_needed=points_needed)
     else:
         return redirect(url_for('home'))
 
@@ -582,13 +580,13 @@ def create_product():
             flash('Invalid file type. Only PNG, JPG, JPEG, and GIF files are allowed.', 'error')
             return redirect(url_for('create_product'))
 
-    return render_template('createProduct.html', form=create_product_form)
+    return render_template('Staff/createProduct.html', form=create_product_form)
 
 
 @app.route('/retrieveProducts')
 def retrieve_product():
     products = Product.query.all()
-    return render_template('retrieveProduct.html', products_list=products, count=len(products))
+    return render_template('Staff/retrieveProduct.html', products_list=products, count=len(products))
 
 
 @app.route('/updateProduct/<int:id>', methods=['GET', 'POST'])
@@ -616,7 +614,7 @@ def update_product(id):
         flash('Product updated successfully.', 'success')
         return redirect(url_for('retrieve_product'))
 
-    return render_template('updateProduct.html', form=update_product_form, product=product)
+    return render_template('Staff/updateProduct.html', form=update_product_form, product=product)
 
 
 @app.route('/delete_product/<int:id>', methods=['POST'])
@@ -631,7 +629,7 @@ def delete_product(id):
         os.remove(photo_path)
 
     flash('Product deleted successfully.', 'success')
-    return redirect(url_for('retrieve_product'))
+    return redirect(url_for('Staff/retrieve_product'))
 
 
 # Define a route to serve static files
@@ -663,7 +661,7 @@ def create_payment():
             flash('Payment details added successfully.', 'success')
             app.logger.info(f'Payment details added for user: {session["username"]}')
             return redirect(url_for('retrieve_payment'))
-        return render_template('payment_details.html', form=form)
+        return render_template('Customer/payment_details.html', form=form)
 
 
 @app.route('/retrieve_payment')
@@ -693,7 +691,7 @@ def retrieve_payment():
             'card_name': payment.card_name})
 
     app.logger.info(f'Payment details retrieved for user: {session["username"]}')
-    return render_template('view_payment_details.html', count=len(payment_details_list), payment_details_list=payment_details_list)
+    return render_template('Customer/view_payment_details.html', count=len(payment_details_list), payment_details_list=payment_details_list)
 
 
 @app.route('/delete_payment/<int:id>', methods=['POST'])
@@ -732,7 +730,7 @@ def order_collection():
         return redirect(url_for('show_products'))
 
     app.logger.info('Order collection page accessed by user: %s', session.get('username', 'unknown'))
-    return render_template('order_collection.html', form=collection_Type)
+    return render_template('Customer/order_collection.html', form=collection_Type)
 
 
 @app.route('/products', endpoint='show_products')
@@ -748,7 +746,7 @@ def show_products():
             return render_template('error.html', error_message="Order not found")
 
         app.logger.info('Products page accessed by user: %s for order_id: %s', session.get('username', 'unknown'), order.order_id)
-        return render_template('products.html', food=food, coffee=coffee, non_coffee=non_coffee, cart=order.items)
+        return render_template('Customer/products.html', food=food, coffee=coffee, non_coffee=non_coffee, cart=order.items)
 
     except Exception as e:
         return render_template('error.html', error_message=f"An error occurred: {str(e)}")
@@ -822,7 +820,7 @@ def view_cart():
         delivery_amount = calculate_delivery_amount(order.collection_type)
         grand_total = calculate_grand_total(subtotal, sales_tax, delivery_amount, order.collection_type)
 
-        return render_template('view_cart.html', cart=order_items, subtotal=subtotal, sales_tax=sales_tax,
+        return render_template('Customer/view_cart.html', cart=order_items, subtotal=subtotal, sales_tax=sales_tax,
                                delivery_amount=delivery_amount, grand_total=grand_total)
 
     except Exception as e:
@@ -912,7 +910,7 @@ def payment_page():
         if not payments:
             if request.method == 'POST':
                 payment_detail = request.form.get('payment_detail')
-            return render_template('payment.html', has_payment_details=False, form=payment_detail)
+            return render_template('Customer/payment.html', has_payment_details=False, form=payment_detail)
         else:
             payment_details_list = []
             for payment in payments:
@@ -921,7 +919,7 @@ def payment_page():
                 payment_details_list.append({
                     'id': payment.id, 'card_number': formatted_card_number, 'expiration_date': payment.expiration_date, 'cvv': payment.cvv, 'card_name': payment.card_name})
             app.logger.info('Payment details displayed for user: %s', session.get('username', 'unknown'))
-            return render_template('payment.html', payment_details_list=payment_details_list, has_payment_details=True)
+            return render_template('Customer/payment.html', payment_details_list=payment_details_list, has_payment_details=True)
     else:
         app.logger.warning('User not found while accessing payment page')
         return redirect(url_for('/'))
@@ -1025,7 +1023,7 @@ def success_payment():
             session.pop('started_order_process', None)
             app.logger.info('Order %s successfully processed and cleared from database', order.order_id)
 
-            return render_template('success_payment.html', order_id=order.order_id, order_data=order.collection_type, grand_total=grand_total, collection_type=order.collection_type, order_cart=order_items, points_earned=points_earned)
+            return render_template('Customer/success_payment.html', order_id=order.order_id, order_data=order.collection_type, grand_total=grand_total, collection_type=order.collection_type, order_cart=order_items, points_earned=points_earned)
 
         except Exception as e:
             db.session.rollback()
@@ -1045,7 +1043,7 @@ def order_history():
     orders = Order.query.filter(and_(Order.username == username, Order.grand_total.isnot(None))).all()
 
     if orders:
-        return render_template('order_history.html', orders=orders, username=username)
+        return render_template('Customer/order_history.html', orders=orders, username=username)
     else:
         return redirect(url_for('home'))
 
@@ -1060,17 +1058,17 @@ def customer_order():
 
     orders = Order.query.filter(Order.grand_total.isnot(None)).order_by(Order.created_at.desc()).all()
 
-    return render_template('customer_orders.html', orders=orders)
+    return render_template('Staff/customer_orders.html', orders=orders)
 
 
 @app.route('/contactUs')
 def contact_us():
-    return render_template('contactUs.html')
+    return render_template('All/contactUs.html')
 
 
 @app.route('/chatbot', methods=['GET'])
 def chat_bot_page():
-    return render_template('chatbot.html')
+    return render_template('All/chatbot.html')
 
 
 @app.route('/ChatBot', methods=['POST'])
@@ -1100,7 +1098,7 @@ def create_feedback():
         db.session.commit()
 
         return redirect(url_for('contact_us'))
-    return render_template('createFeedback.html', form=create_feedback_form)
+    return render_template('All/createFeedback.html', form=create_feedback_form)
 
 
 @app.route('/retrieveFeedback')
@@ -1122,7 +1120,7 @@ def retrieve_feedback():
             'feedback': feedback.feedback,
         })
 
-    return render_template('retrieveFeedback.html', count=len(feedbacks_list), feedbacks_list=feedbacks_list)
+    return render_template('Admin/retrieveFeedback.html', count=len(feedbacks_list), feedbacks_list=feedbacks_list)
 
 
 @app.route('/deleteFeedback/<int:feedback_id>', methods=['POST'])
@@ -1150,4 +1148,4 @@ def view_logs():
         Log.message.ilike('%warning%') | Log.message.ilike('%error%')
     ).order_by(Log.created_at.desc()).all()
 
-    return render_template('Logs.html', logs=logs)
+    return render_template('Admin/Logs.html', logs=logs)

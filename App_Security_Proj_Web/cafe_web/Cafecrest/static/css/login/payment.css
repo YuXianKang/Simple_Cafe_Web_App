@@ -1,0 +1,46 @@
+  .container {
+        max-width: 600px;
+        margin: auto;
+    }
+
+  .flash-message {
+        margin-bottom: 10px;
+    }
+
+  .form-group1 {
+        margin-bottom: 15px;
+    }
+
+   .toggle-password {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #999;
+    }
+
+   .toggle-password:hover {
+        color: #666;
+    }
+
+   .position-relative {
+        position: relative;
+    }
+
+
+    .alert-success {
+        margin-top: 20px;
+    }
+
+    h4 {
+        margin-top: 20px;
+    }
+
+    table {
+        margin-top: 20px;
+    }
+
+    .mt-3 {
+        margin-top: 20px;
+    }

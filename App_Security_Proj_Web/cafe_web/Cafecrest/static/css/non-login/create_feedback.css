@@ -1,0 +1,28 @@
+   body {
+        font-family: 'julius sans one';
+        background-color: #b0926a;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        padding: 10px;
+        border-radius: 25px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+   .div {
+        width: 30%;
+        margin: auto;
+    }
+
+    h2 {
+        text-align: center;
+    }

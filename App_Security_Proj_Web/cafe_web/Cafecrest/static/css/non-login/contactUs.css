@@ -1,0 +1,40 @@
+h1, h2, p {
+        text-align: center;
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 1rem;
+    }
+
+     h2 {
+        margin-top: 0;
+    }
+
+   .card {
+        margin-bottom: 2rem;
+        border-radius:.25rem;
+    }
+
+   .card-body {
+        padding: 1rem;
+    }
+
+   .card-title {
+        margin-bottom:.5rem;
+    }
+
+   .card-link {
+        display: inline-block;
+        margin-top:.5rem;
+    }
+
+    .card {
+        background-color: white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        margin-bottom: 30px;
+        padding: 20px;
+        transition: transform 0.15s ease-in-out;
+    }
+
+   .card:hover {
+        transform: translateY(-5px);
+    }

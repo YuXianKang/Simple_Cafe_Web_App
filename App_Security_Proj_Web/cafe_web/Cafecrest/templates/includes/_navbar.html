@@ -3,44 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>CaféCrest</title>
-<style>
-   .navbar {
-        padding: 0!important;
-        height: 100px!important;
-    }
-   .bg-brown {
-        background-color: #b0926a;
-    }
-   .julius-font {
-        font-family: 'Julius Sans One', sans-serif;
-        font-weight: lighter;
-        font-size: 40px;
-    }
-   .navbar-toggling {
-        padding:.25rem.75rem;
-        font-size: 1.25rem;
-        line-height: 1;
-        background-color: transparent;
-        border: 1px solid transparent;
-        border-radius:.25rem;
-        transition: box-shadow.15s ease-in-out;
-    }
-    button {
-        padding: 0;
-        border: none;
-        background: none;
-        border-radius: 10px;
-    }
-    button.nav-search-button {
-        padding: 0;
-        border-color: transparent;
-        background: #b0926a;
-    }
-   .nav-search-button:hover {
-        background: #8c7454;
-        transition: 0.3s;
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/navbar/navbar.css') }}">
 </head>
 <body>
 <nav class="navbar bg-brown navbar-expand-sm navbar-dark">

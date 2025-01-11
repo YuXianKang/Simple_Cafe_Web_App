@@ -1,0 +1,53 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login/view_payment_details.css') }}">
+
+{% extends "base.html" %}
+    {% block title %} VIEWING PAYMENT DETAILS {% endblock %}
+    {% block content %}
+    <div class="container">
+        <h1 class="text-center" style="color: #8B4513;">Viewing Payment Details</h1>
+        <div>
+            <div class="flash-message mb-3">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            {% if message.startswith('Payment details deleted successfully') %}
+                                <p class="mb-0">{{ message }}</p>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <table class="table mt-3">
+                <thead>
+                <tr>
+                    <th scope="col">Payment Details ID</th>
+                    <th scope="col">Card Number</th>
+                    <th scope="col">Expiration Date</th>
+                    <th scope="col">CVV</th>
+                    <th scope="col">Card Name</th>
+                    <th scope="col">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for payment_detail in payment_details_list %}
+                <tr>
+                    <td>{{ payment_detail.id }}</td>
+                    <td>{{ payment_detail.card_number }}</td>
+                    <td>{{ payment_detail.expiration_date }}</td>
+                    <td>{{ payment_detail.cvv }}</td>
+                    <td>{{ payment_detail.card_name }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_payment', id=payment_detail.id) }}" method="POST">
+                            <input type="submit" value="Delete" class="btn btn-danger btn-delete" onclick="return confirm('Are you sure you want to delete {{payment_detail.card_number}} card details?');">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <a href="/payment_details" class="btn btn-dark">Add New Card Details</a>
+        </div>
+    </div>
+{% endblock %}

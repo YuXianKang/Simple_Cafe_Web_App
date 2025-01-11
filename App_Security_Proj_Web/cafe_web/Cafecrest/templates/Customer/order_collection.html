@@ -1,0 +1,20 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login/order_collection.css') }}">
+
+{% extends "base.html" %}
+{% block title %} ORDER COLLECTION {% endblock %}
+
+{% block content %}
+{% if not session.logged_in %}
+<p>Not signed in</p>
+<a href="/Login">click here to log in</a>
+<a href="/createSignUp">click here to sign up</a>
+{% else %}
+    {% from "includes/_formHelper.html" import render_field %}
+
+    <form method="post" class="form-group0">
+        {{ render_field(form.collection_type, class="form-control warm-text") }}
+        <input type="submit" value="Enter" class="warm-button">
+    </form>
+{% endif %}
+{% endblock %}
+
